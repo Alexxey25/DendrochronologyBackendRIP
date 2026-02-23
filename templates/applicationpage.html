@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дендрохронологический анализ древесины</title>
+  <link rel="stylesheet" href="/static/styles/styles.css">
+</head>
+<body>
+<div class="applicationpage">
+  <div class="header-bar_app">
+    <a href="/" class="prototype-link">
+      <img src="/static/img/YURDIS_logo.svg" class="YURDIS_logo_app" alt="logo" />
+      <img src="/static/img/YURDIS_logo_text.svg" class="YURDIS_logo_text" alt="logo-text" />
+    </a>
+  </div>
+
+  <div class="app_fields app_characteristics">
+    <p class="app_name">Заявка № 1 — Датировка деревянных конструкций</p>
+    <p>ID заявки: 1</p>
+    <p>Описание: Дендрохронологический анализ деревянных конструкций с учетом use-life древесины и поправок на археологический контекст</p>
+    <p>Количество образцов: <span id="total-samples">2</span></p>
+    <p>Количество конструкций: {{ len .applications }}</p>
+    <div class="date_of_construction app_characteristics">
+      <p>Предварительная дата постройки: <span id="build-date">2025 г.</span></p>
+    </div>
+  </div>
+
+  <div class="app-table-header">
+    <span></span>
+    <span>Тип деревянной конструкции</span>
+    <span>Use-life</span>
+    <span>Поправка на дату</span>
+    <span>Дата рубки</span>
+    <span>Кол-во ед.</span>
+    <span></span>
+  </div>
+
+  {{ range .applications }}
+  <div class="app-row">
+    <img src="{{ $.minioBase }}/{{ .ImageKey }}" class="app-row-image" alt="{{ .ConstructionTitle }}" />
+    <span>{{ .ConstructionTitle }}</span>
+    <span>{{ .UseLife }}</span>
+    <span class="date-correction">{{ .DateCorrection }}</span>
+    <span class="cutting-date">{{ .CuttingDate }}</span>
+    <div class="qty-controls">
+      <button type="button" class="qty-btn">-</button>
+      <span class="qty-value">{{ .SamplesCount }}</span>
+      <button type="button" class="qty-btn">+</button>
+    </div>
+    <button type="button" class="save-btn">Сохранить</button>
+  </div>
+  {{ end }}
+
+  <div class="app-actions">
+    <button type="button" class="btn-submit">Оформить заявку</button>
+    <button type="button" class="btn-delete">Удалить заявку</button>
+  </div>
+
+</div>
+</body>
+</html>
