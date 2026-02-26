@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дендрохронологический анализ древесины</title>
+  <link rel="stylesheet" href="/static/styles/styles.css">
+</head>
+<body>
+<div class="applicationpage">
+  <div class="header-bar_app">
+    <a href="/" class="prototype-link">
+      <img src="/static/img/YURDIS_logo.svg" class="YURDIS_logo_app" alt="logo" />
+      <img src="/static/img/YURDIS_logo_text.svg" class="YURDIS_logo_text" alt="logo-text" />
+    </a>
+  </div>
+
+  {{ if .application }}
+  <div class="app_fields app_characteristics">
+    <p class="app_name">Заявка № {{ .application.ID }} — Датировка деревянных конструкций</p>
+    <p>ID заявки: {{ .application.ID }}</p>
+    <p>Статус: {{ .application.Status }}</p>
+    <p>Дата создания: {{ .application.DateCreate.Format "02.01.2006 15:04" }}</p>
+    <p>Описание: Дендрохронологический анализ деревянных конструкций с учетом use-life древесины и поправок на археологический контекст</p>
+    <p>Количество образцов: <span id="total-samples">{{ .totalSamples }}</span></p>
+    <p>Количество конструкций: {{ len .constructions }}</p>
+    <div class="date_of_construction app_characteristics">
+      <p>Предварительная дата постройки: <span id="build-date">2025 г.</span></p>
+    </div>
+  </div>
+
+  {{ if .constructions }}
+  <div class="app-table-header">
+    <span></span>
+    <span>Тип деревянной конструкции</span>
+    <span>Use-life</span>
+    <span>Поправка на дату</span>
+    <span>Дата рубки</span>
+    <span>Кол-во ед.</span>
+  </div>
+
+  {{ range .constructions }}
+  <div class="app-row">
+    {{ if .ImageURL }}
+    <img src="{{ $.minioBase }}/{{ .ImageURL }}" class="app-row-image" alt="{{ .ConstructionTitle }}" />
+    {{ else }}
+    <div class="app-row-image app-row-image-placeholder"></div>
+    {{ end }}
+    <span>{{ .ConstructionTitle }}</span>
+    <span>{{ .UseLife }}</span>
+    <span class="date-correction">{{ .DateCorrection }}</span>
+    <span class="cutting-date">{{ .CuttingDate }}</span>
+    <div class="qty-controls">
+      <button type="button" class="qty-btn">-</button>
+      <span class="qty-value">{{ .SamplesCount }}</span>
+      <button type="button" class="qty-btn">+</button>
+    </div>
+  </div>
+  {{ end }}
+  {{ end }}
+
+  <div class="app-actions">
+    <!-- <button type="button" class="btn-submit">Оформить заявку</button> -->
+    <form action="/delete-application" method="POST">
+      <input type="hidden" name="application_id" value="{{ .application.ID }}">
+      <button type="submit" class="btn-delete">Удалить заявку</button>
+    </form>
+  </div>
+
+  {{ else }}
+  <div class="app_fields app_characteristics">
+    <p class="app_name">У вас нет текущей заявки</p>
+    <p>Добавьте конструкцию в заявку на <a href="/">главной странице</a></p>
+  </div>
+  {{ end }}
+
+</div>
+</body>
+</html>
