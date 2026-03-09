@@ -7,7 +7,5 @@ type Construction struct {
 	Description       string `gorm:"type:text;not null"`
 	ImageURL          string `gorm:"type:varchar(255)"`
 	VideoURL          string `gorm:"type:varchar(255)"`
-	CuttingDate       string `gorm:"type:varchar(20)"`
-	DateCorrection    string `gorm:"type:varchar(20)"`
 	IsDelete          bool   `gorm:"type:boolean;not null;default:false"`
 }

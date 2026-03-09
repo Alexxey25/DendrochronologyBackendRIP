@@ -45,8 +45,8 @@ func (r *Repository) GetDendrochronologyWithConstructions(dendrochronologyID uin
 			UseLife:           item.Construction.UseLife,
 			ImageURL:          item.Construction.ImageURL,
 			SamplesCount:      item.SamplesCount,
-			CuttingDate:       item.Construction.CuttingDate,
-			DateCorrection:    item.Construction.DateCorrection,
+			CuttingDate:       item.CuttingDate,
+			DateCorrection:    item.DateCorrection,
 		})
 	}
 
@@ -63,15 +63,14 @@ type DendrochronologyConstructionView struct {
 	DateCorrection    string
 }
 
-// GetEstimatedBuildYear рассчитывает предварительную дату постройки заявки
-// как max(cutting_date + date_correction) по всем связанным конструкциям.
+// GetEstimatedBuildYear — предварительная дата постройки = max(cutting_date + date_correction)
+// по строкам связи dendrochronology_constructions (по ER cutting_date и date_correction в этой таблице).
 func (r *Repository) GetEstimatedBuildYear(dendrochronologyID uint) int {
 	var year int
 
-	r.db.Table("dendrochronology_constructions AS dc").
-		Joins("JOIN constructions c ON c.id = dc.construction_id").
-		Where("dc.dendrochronology_id = ? AND c.cutting_date <> '' AND c.date_correction <> ''", dendrochronologyID).
-		Select("MAX((c.cutting_date)::int + (c.date_correction)::int)").
+	r.db.Table("dendrochronology_constructions").
+		Where("dendrochronology_id = ? AND cutting_date <> '' AND cutting_date IS NOT NULL AND date_correction <> '' AND date_correction IS NOT NULL", dendrochronologyID).
+		Select("MAX((cutting_date)::int + (date_correction)::int)").
 		Scan(&year)
 
 	return year
