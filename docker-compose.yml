@@ -1,49 +1,86 @@
-#version: "3.8" # версия вашего docker-compose
+x-minio-common: &minio-common
+  image: quay.io/minio/minio:RELEASE.2022-10-15T19-57-03Z
+  command: server --console-address ":9001" http://minio{1...4}/data{1...2}
+  environment:
+    MINIO_ACCESS_KEY: lexa
+    MINIO_SECRET_KEY: qwerty123
+  expose:
+    - "9000"
+    - "9001"
+  healthcheck:
+    test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+    interval: 30s
+    timeout: 20s  
+    retries: 3
+
 services:
-  # имеджи, которые запустятся по вашему желанию
-  db:
-    # название моего имеджа
-    image: postgres:12 # скачает image postgres 12 версии
-    volumes:
-      # часть настроек для хранения данных, пока для нас это не важно
-      - type: volume
-        source: postgresdb-data
-        target: /var/lib/postgresql/data
-    ports:
-      # порты
-      - "5432:5432"
+  postgres:
+    image: postgres:17
     environment:
-      # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
       POSTGRES_USER: lexa
-      POSTGRES_DB: RIP
       POSTGRES_PASSWORD: qwerty123
-  minio:
-    container_name: minio
-    image: minio/minio:latest
+      POSTGRES_DB: dendro_db
     ports:
-      - "9000:9000" #порт для API MinIO.
-      - "9001:9001" #порт для консоли управления MinIO.
-    environment:
-      MINIO_ACCESS_KEY: lexa
-      MINIO_SECRET_KEY: qwerty123
-      MINIO_CONSOLE_ADDRESS: ":9001"
+      - "5432:5432"
     volumes:
-      - minio-data:/data
-    command: server /data
-  redis:
-    image: redis:6.2-alpine
-    restart: always
+      - postgres_data:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer:latest
     ports:
-      - '6379:6379'
-    command: redis-server --save 20 1 --loglevel warning --requirepass qwerty123
+      - "8888:8080"
+    depends_on:
+      - postgres
+
+  minio1:
+    <<: *minio-common
+    hostname: minio1
     volumes:
-      - redis-data:/data
+      - data1-1:/data1
+      - data1-2:/data2
+
+  minio2:
+    <<: *minio-common
+    hostname: minio2
+    volumes:
+      - data2-1:/data1
+      - data2-2:/data2
+
+  minio3:
+    <<: *minio-common
+    hostname: minio3
+    volumes:
+      - data3-1:/data1
+      - data3-2:/data2
+
+  minio4:
+    <<: *minio-common
+    hostname: minio4
+    volumes:
+      - data4-1:/data1
+      - data4-2:/data2
+
+  nginx:
+    image: nginx:1.19.2-alpine
+    hostname: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "9090:9000"
+      - "9091:9001"
+    depends_on:
+      - minio1
+      - minio2
+      - minio3
+      - minio4
 
 volumes:
-  # часть настроек для хранения данных
-  postgresdb-data:
-    driver: local
-  minio-data:
-    driver: local
-  redis-data:
-    driver: local
+  postgres_data:
+  data1-1:
+  data1-2:
+  data2-1:
+  data2-2:
+  data3-1:
+  data3-2:
+  data4-1:
+  data4-2:
