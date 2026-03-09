@@ -35,6 +35,9 @@ services:
   minio1:
     <<: *minio-common
     hostname: minio1
+    ports:
+      - "9000:9000"
+      - "9001:9001"
     volumes:
       - data1-1:/data1
       - data1-2:/data2

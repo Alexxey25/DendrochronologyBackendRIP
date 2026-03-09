@@ -9,13 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (h *Handler) GetApplication(ctx *gin.Context) {
+func (h *Handler) GetDendrochronology(ctx *gin.Context) {
 	draftApp, err := h.Repository.GetDraftApplication(creatorID)
 	if err != nil {
-		ctx.HTML(http.StatusOK, "applicationpage.html", gin.H{
-			"application":   nil,
-			"constructions": nil,
-		})
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
@@ -27,16 +24,18 @@ func (h *Handler) GetApplication(ctx *gin.Context) {
 	}
 
 	totalSamples := h.Repository.GetTotalSamples(draftApp.ID)
+	buildYear := h.Repository.GetEstimatedBuildYear(draftApp.ID)
 
-	ctx.HTML(http.StatusOK, "applicationpage.html", gin.H{
-		"application":   draftApp,
-		"constructions": views,
-		"totalSamples":  totalSamples,
-		"minioBase":     minioBaseURL,
+	ctx.HTML(http.StatusOK, "dendrochronologypage.html", gin.H{
+		"dendrochronology": draftApp,
+		"constructions":    views,
+		"totalSamples":     totalSamples,
+		"buildYear":        buildYear,
+		"minioBase":        minioBaseURL,
 	})
 }
 
-func (h *Handler) AddToApplication(ctx *gin.Context) {
+func (h *Handler) AddToDendrochronology(ctx *gin.Context) {
 	strId := ctx.PostForm("construction_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -72,11 +71,11 @@ func (h *Handler) UpdateSamplesCount(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	ctx.Redirect(http.StatusFound, "/application")
+	ctx.Redirect(http.StatusFound, "/dendrochronology")
 }
 
 func (h *Handler) FormApplication(ctx *gin.Context) {
-	strId := ctx.PostForm("application_id")
+	strId := ctx.PostForm("dendrochronology_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -93,8 +92,8 @@ func (h *Handler) FormApplication(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/")
 }
 
-func (h *Handler) DeleteApplication(ctx *gin.Context) {
-	strId := ctx.PostForm("application_id")
+func (h *Handler) DeleteDendrochronology(ctx *gin.Context) {
+	strId := ctx.PostForm("dendrochronology_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

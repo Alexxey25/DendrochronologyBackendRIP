@@ -63,6 +63,21 @@ type ApplicationConstructionView struct {
 	DateCorrection    string
 }
 
+// GetEstimatedBuildYear рассчитывает предварительную дату постройки заявки
+// как max(cutting_date + date_correction) по всем связанным конструкциям.
+// cutting_date и date_correction хранятся как строки с годом и поправкой в годах.
+func (r *Repository) GetEstimatedBuildYear(applicationID uint) int {
+	var year int
+
+	r.db.Table("application_constructions AS ac").
+		Joins("JOIN constructions c ON c.id = ac.construction_id").
+		Where("ac.application_id = ? AND c.cutting_date <> '' AND c.date_correction <> ''", applicationID).
+		Select("MAX((c.cutting_date)::int + (c.date_correction)::int)").
+		Scan(&year)
+
+	return year
+}
+
 func (r *Repository) AddConstructionToApplication(constructionID uint, creatorID uint) error {
 	var app ds.Application
 	err := r.db.Where("creator_id = ? AND status = ?", creatorID, ds.StatusDraft).First(&app).Error

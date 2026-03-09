@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="/static/styles/styles.css">
 </head>
 <body>
-<div class="applicationpage">
+<div class="dendrochronologypage">
   <div class="header-bar_app">
     <a href="/" class="prototype-link">
       <img src="/static/img/YURDIS_logo.svg" class="YURDIS_logo_app" alt="logo" />
@@ -15,21 +15,21 @@
     </a>
   </div>
 
-  {{ if .application }}
+  {{ if .dendrochronology }}
   <div class="app_fields app_characteristics">
-    <p class="app_name">Заявка № {{ .application.ID }} — Датировка деревянных конструкций</p>
-    <p>ID заявки: {{ .application.ID }}</p>
-    <p>Статус: {{ .application.Status }}</p>
-    <p>Дата создания: {{ .application.DateCreate.Format "02.01.2006 15:04" }}</p>
-    <p>Описание: Дендрохронологический анализ деревянных конструкций с учетом use-life древесины и поправок на археологический контекст</p>
-    <p>Количество образцов: <span id="total-samples">{{ .totalSamples }}</span></p>
-    <p>Количество конструкций: {{ len .constructions }}</p>
+    <p class="app_name">Заявка № {{ .dendrochronology.ID }} — Датировка деревянных конструкций</p>
     <div class="date_of_construction app_characteristics">
-      <p>Предварительная дата постройки: <span id="build-date">2025 г.</span></p>
+      <p>
+        Предварительная дата постройки:
+        {{ if gt .buildYear 0 }}
+          <span id="build-date">{{ .buildYear }} г.</span>
+        {{ else }}
+          <span id="build-date">—</span>
+        {{ end }}
+      </p>
     </div>
   </div>
 
-  {{ if .constructions }}
   <div class="app-table-header">
     <span></span>
     <span>Тип деревянной конструкции</span>
@@ -51,9 +51,7 @@
     <span class="date-correction">{{ .DateCorrection }}</span>
     <span class="cutting-date">{{ .CuttingDate }}</span>
     <div class="qty-controls">
-      <button type="button" class="qty-btn">-</button>
-      <span class="qty-value">{{ .SamplesCount }}</span>
-      <button type="button" class="qty-btn">+</button>
+      <input type="number" class="qty-input" min="1" value="{{ .SamplesCount }}"/>
     </div>
   </div>
   {{ end }}
@@ -61,18 +59,11 @@
 
   <div class="app-actions">
     <!-- <button type="button" class="btn-submit">Оформить заявку</button> -->
-    <form action="/delete-application" method="POST">
-      <input type="hidden" name="application_id" value="{{ .application.ID }}">
+    <form action="/delete-dendrochronology" method="POST">
+      <input type="hidden" name="dendrochronology_id" value="{{ .dendrochronology.ID }}">
       <button type="submit" class="btn-delete">Удалить заявку</button>
     </form>
   </div>
-
-  {{ else }}
-  <div class="app_fields app_characteristics">
-    <p class="app_name">У вас нет текущей заявки</p>
-    <p>Добавьте конструкцию в заявку на <a href="/">главной странице</a></p>
-  </div>
-  {{ end }}
 
 </div>
 </body>

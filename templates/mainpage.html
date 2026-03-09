@@ -9,10 +9,12 @@
 <body>
 <div class="mainpage">
   <div class="header-bar">
-    <a href="/" class="prototype-link">
-      <img src="/static/img/YURDIS_logo.svg" class="YURDIS_logo" alt="logo" />
-      <img src="/static/img/YURDIS_logo_text.svg" class="YURDIS_logo_text" alt="logo-text" />
-    </a>
+    <div class="header-logo">
+      <a href="/" class="prototype-link">
+        <img src="/static/img/YURDIS_logo.svg" class="YURDIS_logo" alt="logo" />
+        <img src="/static/img/YURDIS_logo_text.svg" class="YURDIS_logo_text" alt="logo-text" />
+      </a>
+    </div>
     <form action="/" method="GET" class="search-form">
       <input class="search-input" type="text" name="query" placeholder="Найти конструкцию" value="{{ .query }}">
       <button class="search-btn" type="submit" aria-label="search">
@@ -20,7 +22,8 @@
       </button>
     </form> 
   </div>
-  
+
+
   <div class="cards-grid">
     {{ range .constructions }}
     <div class="construction-card">
@@ -36,7 +39,7 @@
         </div>
       </a>
       <div class="card-actions">
-        <form action="/add-to-application" method="POST">
+        <form action="/add-to-dendrochronology" method="POST">
           <input type="hidden" name="construction_id" value="{{ .ID }}">
           <button type="submit" class="btn-add-small">+ В заявку</button>
         </form>
@@ -47,7 +50,7 @@
 
   <div class="cart-badge {{ if eq .cartCount 0 }}cart-inactive{{ end }}">
     {{ if ne .cartCount 0 }}
-    <a href="/application">
+    <a href="/dendrochronology">
     {{ end }}
       <img src="/static/img/cart_icon.png" class="cart-icon" alt="корзина" />
       <span class="cart-count">{{ .cartCount }}</span>
