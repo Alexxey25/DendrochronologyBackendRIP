@@ -259,7 +259,7 @@ img {
 
 .app-table-header {
   display: grid;
-  grid-template-columns: 50px 400px 130px 200px 210px auto;
+  grid-template-columns: 60px 470px 190px 260px 250px auto;
   gap: 10px;
   margin: 20px 40px 0;
   padding: 16px 20px;
@@ -289,35 +289,32 @@ img {
   border-radius: 5px;
 }
 
-.qty-controls {
+/* Поле количества образцов (число, без кнопок, пока не функционально) */
+.samples-count-field {
   display: flex;
   align-items: center;
-  gap: 8px;
 }
 
-.qty-btn {
-  width: 32px;
-  height: 32px;
-  border-radius: 6px;
-  border: 1px solid rgba(162,125,75,0.5);
-  background: rgba(255,196,120,0.3);
-  font-size: 18px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #000;
-  transition: background 0.2s;
-}
-
-.qty-btn:hover {
-  background: rgba(255,196,120,0.6);
-}
-
-.qty-value {
+.samples-count-input {
+  width: 4em;
+  padding: 6px 10px;
   font-size: 16px;
-  min-width: 24px;
   text-align: center;
+  border: 1px solid rgba(162, 125, 75, 0.5);
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* Убираем стрелочки регулировки у number */
+.samples-count-input::-webkit-outer-spin-button,
+.samples-count-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.samples-count-input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
 .save-btn {

@@ -30,7 +30,7 @@ func (h *Handler) GetConstructions(ctx *gin.Context) {
 	}
 
 	cartCount := h.Repository.GetCartCount(creatorID)
-	draftID := h.Repository.GetDraftApplicationID(creatorID)
+	draftID := h.Repository.GetDraftDendrochronologyID(creatorID)
 
 	ctx.HTML(http.StatusOK, "mainpage.html", gin.H{
 		"constructions": constructions,

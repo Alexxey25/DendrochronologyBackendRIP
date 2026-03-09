@@ -21,9 +21,9 @@ func NewHandler(r *repository.Repository) *Handler {
 func (h *Handler) RegisterHandler(router *gin.Engine) {
 	router.GET("/", h.GetConstructions)
 	router.GET("/construction/:id", h.GetConstruction)
-	router.GET("/application", h.GetApplication)
-	router.POST("/add-to-application", h.AddToApplication)
-	router.POST("/delete-application", h.DeleteApplication)
+	router.GET("/dendrochronology", h.GetDendrochronology)
+	router.POST("/add-to-dendrochronology", h.AddToDendrochronology)
+	router.POST("/delete-dendrochronology", h.DeleteDendrochronology)
 }
 
 func (h *Handler) RegisterStatic(router *gin.Engine) {

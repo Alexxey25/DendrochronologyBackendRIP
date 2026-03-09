@@ -18,8 +18,8 @@ func main() {
 	err = db.AutoMigrate(
 		&ds.Users{},
 		&ds.Construction{},
-		&ds.Application{},
-		&ds.ApplicationConstruction{},
+		&ds.Dendrochronology{},
+		&ds.DendrochronologyConstruction{},
 	)
 	if err != nil {
 		panic("cant migrate db")

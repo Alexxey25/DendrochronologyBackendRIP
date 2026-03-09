@@ -13,7 +13,7 @@ const (
 	StatusRejected  = "отклонён"
 )
 
-type Application struct {
+type Dendrochronology struct {
 	ID            uint         `gorm:"primaryKey"`
 	Status        string       `gorm:"type:varchar(20);not null"`
 	DateCreate    time.Time    `gorm:"not null"`
@@ -26,4 +26,9 @@ type Application struct {
 
 	Creator   Users  `gorm:"foreignKey:CreatorID"`
 	Moderator *Users `gorm:"foreignKey:ModeratorID"`
+}
+
+// TableName — таблица заявок в БД.
+func (Dendrochronology) TableName() string {
+	return "dendrochronologies"
 }

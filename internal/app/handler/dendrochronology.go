@@ -9,34 +9,33 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func (h *Handler) GetApplication(ctx *gin.Context) {
-	draftApp, err := h.Repository.GetDraftApplication(creatorID)
+func (h *Handler) GetDendrochronology(ctx *gin.Context) {
+	draft, err := h.Repository.GetDraftDendrochronology(creatorID)
 	if err != nil {
-		ctx.HTML(http.StatusOK, "applicationpage.html", gin.H{
-			"application":   nil,
-			"constructions": nil,
-		})
+		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
-	_, views, err := h.Repository.GetApplicationWithConstructions(draftApp.ID)
+	_, views, err := h.Repository.GetDendrochronologyWithConstructions(draft.ID)
 	if err != nil {
 		logrus.Error(err)
 		ctx.Redirect(http.StatusFound, "/")
 		return
 	}
 
-	totalSamples := h.Repository.GetTotalSamples(draftApp.ID)
+	totalSamples := h.Repository.GetTotalSamples(draft.ID)
+	buildYear := h.Repository.GetEstimatedBuildYear(draft.ID)
 
-	ctx.HTML(http.StatusOK, "applicationpage.html", gin.H{
-		"application":   draftApp,
-		"constructions": views,
-		"totalSamples":  totalSamples,
-		"minioBase":     minioBaseURL,
+	ctx.HTML(http.StatusOK, "dendrochronologypage.html", gin.H{
+		"dendrochronology": draft,
+		"constructions":    views,
+		"totalSamples":     totalSamples,
+		"buildYear":        buildYear,
+		"minioBase":        minioBaseURL,
 	})
 }
 
-func (h *Handler) AddToApplication(ctx *gin.Context) {
+func (h *Handler) AddToDendrochronology(ctx *gin.Context) {
 	strId := ctx.PostForm("construction_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
@@ -44,7 +43,7 @@ func (h *Handler) AddToApplication(ctx *gin.Context) {
 		return
 	}
 
-	err = h.Repository.AddConstructionToApplication(uint(id), creatorID)
+	err = h.Repository.AddConstructionToDendrochronology(uint(id), creatorID)
 	if err != nil && !strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
 		logrus.Error(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -72,18 +71,18 @@ func (h *Handler) UpdateSamplesCount(ctx *gin.Context) {
 		logrus.Error(err)
 	}
 
-	ctx.Redirect(http.StatusFound, "/application")
+	ctx.Redirect(http.StatusFound, "/dendrochronology")
 }
 
-func (h *Handler) FormApplication(ctx *gin.Context) {
-	strId := ctx.PostForm("application_id")
+func (h *Handler) FormDendrochronology(ctx *gin.Context) {
+	strId := ctx.PostForm("dendrochronology_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = h.Repository.FormApplication(uint(id))
+	err = h.Repository.FormDendrochronology(uint(id))
 	if err != nil {
 		logrus.Error(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -93,15 +92,15 @@ func (h *Handler) FormApplication(ctx *gin.Context) {
 	ctx.Redirect(http.StatusFound, "/")
 }
 
-func (h *Handler) DeleteApplication(ctx *gin.Context) {
-	strId := ctx.PostForm("application_id")
+func (h *Handler) DeleteDendrochronology(ctx *gin.Context) {
+	strId := ctx.PostForm("dendrochronology_id")
 	id, err := strconv.Atoi(strId)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	err = h.Repository.DeleteApplicationBySQL(uint(id))
+	err = h.Repository.DeleteDendrochronologyBySQL(uint(id))
 	if err != nil {
 		logrus.Error(err)
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

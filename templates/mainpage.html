@@ -36,7 +36,7 @@
         </div>
       </a>
       <div class="card-actions">
-        <form action="/add-to-application" method="POST">
+        <form action="/add-to-dendrochronology" method="POST">
           <input type="hidden" name="construction_id" value="{{ .ID }}">
           <button type="submit" class="btn-add-small">+ В заявку</button>
         </form>
@@ -47,7 +47,7 @@
 
   <div class="cart-badge {{ if eq .cartCount 0 }}cart-inactive{{ end }}">
     {{ if ne .cartCount 0 }}
-    <a href="/application">
+    <a href="/dendrochronology">
     {{ end }}
       <img src="/static/img/cart_icon.png" class="cart-icon" alt="корзина" />
       <span class="cart-count">{{ .cartCount }}</span>
