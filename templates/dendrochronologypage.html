@@ -40,7 +40,8 @@
   </div>
 
   {{ range .constructions }}
-  <div class="app-row">
+  <form class="app-row" action="/dendrochronology/update-item" method="POST">
+    <input type="hidden" name="item_id" value="{{ .ID }}">
     {{ if .ImageURL }}
     <img src="{{ $.minioBase }}/{{ .ImageURL }}" class="app-row-image" alt="{{ .ConstructionTitle }}" />
     {{ else }}
@@ -48,18 +49,43 @@
     {{ end }}
     <span>{{ .ConstructionTitle }}</span>
     <span>{{ .UseLife }}</span>
-    <span class="date-correction">{{ .DateCorrection }}</span>
-    <span class="cutting-date">{{ .CuttingDate }}</span>
     <div class="qty-controls">
-      <input type="number" class="qty-input" min="1" value="{{ .SamplesCount }}" />
+      <input
+        type="number"
+        class="qty-input"
+        name="date_correction"
+        min="0"
+        value="{{ .DateCorrection }}"
+        placeholder="Поправка" />
     </div>
-  </div>
+    <div class="qty-controls">
+      <input
+        type="number"
+        class="qty-input"
+        name="cutting_date"
+        min="0"
+        value="{{ .CuttingDate }}"
+        placeholder="Год рубки" />
+    </div>
+    <div class="qty-controls">
+      <input
+        type="number"
+        class="qty-input"
+        name="samples_count"
+        min="1"
+        value="{{ .SamplesCount }}" />
+    </div>
+    <button type="submit" tabindex="-1" class="qty-submit-hidden" aria-hidden="true"></button>
+  </form>
   {{ end }}
   {{ end }}
 
   <div class="app-actions">
-    <!-- <button type="button" class="btn-submit">Оформить заявку</button> -->
-    <form action="/delete-dendrochronology" method="POST">
+    <form action="/form-dendrochronology" method="POST" style="display: inline;">
+      <input type="hidden" name="dendrochronology_id" value="{{ .dendrochronology.ID }}">
+      <button type="submit" class="btn-submit">Сформировать заявку</button>
+    </form>
+    <form action="/delete-dendrochronology" method="POST" style="display: inline;">
       <input type="hidden" name="dendrochronology_id" value="{{ .dendrochronology.ID }}">
       <button type="submit" class="btn-delete">Удалить заявку</button>
     </form>

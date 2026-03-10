@@ -21,8 +21,8 @@ type Dendrochronology struct {
 	DateCompleted sql.NullTime `gorm:"default:null"`
 	CreatorID     uint         `gorm:"not null"`
 	ModeratorID   *uint        `gorm:"default:null"`
-	Description   string       `gorm:"type:text"`
 	TotalSamples  *int         `gorm:"default:null"`
+	BuildDate     *int         `gorm:"column:build_date;default:null"`
 
 	Creator   Users  `gorm:"foreignKey:CreatorID"`
 	Moderator *Users `gorm:"foreignKey:ModeratorID"`

@@ -28,8 +28,6 @@ func main() {
 		logrus.Fatalf("error initializing repository: %v", errRep)
 	}
 
-	rep.ClearDraftDendrochronologiesOnStartup()
-
 	hand := handler.NewHandler(rep)
 
 	dendrochronology := pkg.NewApp(conf, router, hand)

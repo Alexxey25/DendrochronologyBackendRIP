@@ -307,6 +307,18 @@ img {
   gap: 8px;
 }
 
+/* Скрытая кнопка отправки строки: Enter в поле отправляет форму и обновляет предварительную дату */
+.qty-submit-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  border: 0;
+  padding: 0;
+  margin: -1px;
+}
+
 .qty-form {
   display: inline-flex;
 }
