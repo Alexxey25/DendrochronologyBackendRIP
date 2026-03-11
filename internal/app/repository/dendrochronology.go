@@ -132,18 +132,6 @@ func (r *Repository) DeleteDendrochronologyBySQL(dendrochronologyID uint) error 
 	return r.db.Exec("UPDATE dendrochronologies SET status = '"+ds.StatusDeleted+"' WHERE id = ?", dendrochronologyID).Error
 }
 
-func (r *Repository) UpdateSamplesCount(itemID uint, delta int) error {
-	var item ds.DendrochronologyConstruction
-	if err := r.db.First(&item, itemID).Error; err != nil {
-		return err
-	}
-	newCount := item.SamplesCount + delta
-	if newCount < 1 {
-		newCount = 1
-	}
-	return r.db.Model(&item).Update("samples_count", newCount).Error
-}
-
 // UpdateDendrochronologyItem обновляет количество образцов и поля дат
 // для одной строки связи заявки с конструкцией (HTML-форма на странице корзины).
 func (r *Repository) UpdateDendrochronologyItem(itemID uint, samplesCount int, cuttingDate, dateCorrection string) error {

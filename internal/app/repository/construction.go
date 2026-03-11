@@ -43,10 +43,6 @@ func (r *Repository) SearchConstructionsByTitle(title string) ([]ds.Construction
 	return constructions, nil
 }
 
-func (r *Repository) DeleteConstruction(constructionID uint) error {
-	return r.db.Model(&ds.Construction{}).Where("id = ?", constructionID).UpdateColumn("is_delete", true).Error
-}
-
 func (r *Repository) CreateConstruction(j serializer.ConstructionJSON) (ds.Construction, error) {
 	if j.ConstructionTitle == "" {
 		return ds.Construction{}, fmt.Errorf("поле construction_title обязательно")

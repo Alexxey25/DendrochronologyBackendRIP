@@ -85,27 +85,6 @@ func (h *Handler) UpdateDendrochronologyItem(ctx *gin.Context) {
 	ctx.Redirect(http.StatusSeeOther, "/dendrochronology")
 }
 
-func (h *Handler) UpdateSamplesCount(ctx *gin.Context) {
-	strId := ctx.PostForm("item_id")
-	itemID, err := strconv.Atoi(strId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	delta := 1
-	if ctx.PostForm("action") == "decrease" {
-		delta = -1
-	}
-
-	err = h.Repository.UpdateSamplesCount(uint(itemID), delta)
-	if err != nil {
-		logrus.Error(err)
-	}
-
-	ctx.Redirect(http.StatusFound, "/dendrochronology")
-}
-
 func (h *Handler) FormDendrochronology(ctx *gin.Context) {
 	strId := ctx.PostForm("dendrochronology_id")
 	id, err := strconv.Atoi(strId)

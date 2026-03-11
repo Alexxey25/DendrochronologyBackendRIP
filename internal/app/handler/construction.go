@@ -3,7 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 	"github.com/sirupsen/logrus"
@@ -68,18 +67,3 @@ func (h *Handler) GetConstruction(ctx *gin.Context) {
 	})
 }
 
-func (h *Handler) DeleteConstruction(ctx *gin.Context) {
-	strId := ctx.PostForm("construction_id")
-	id, err := strconv.Atoi(strId)
-	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	err = h.Repository.DeleteConstruction(uint(id))
-	if err != nil && !strings.Contains(err.Error(), "duplicate key value violates unique constraint") {
-		logrus.Error(err)
-	}
-
-	ctx.Redirect(http.StatusFound, "/")
-}
