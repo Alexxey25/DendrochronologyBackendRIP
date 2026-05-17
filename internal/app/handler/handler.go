@@ -19,6 +19,8 @@ func NewHandler(r *repository.Repository) *Handler {
 }
 
 func (h *Handler) RegisterHandler(router *gin.Engine) {
+	router.Use(CORSMiddleware())
+
 	router.GET("/", h.GetConstructions)
 	router.GET("/construction/:id", h.GetConstruction)
 	router.GET("/dendrochronology", h.GetDendrochronology)

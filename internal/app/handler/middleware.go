@@ -19,6 +19,25 @@ const (
 
 func bearerPrefix() string { return "Bearer " }
 
+// CORSMiddleware — как в учебном проекте RIP_Golab: единый набор заголовков для фронта / Tauri.
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With",
+		)
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
+
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+		c.Next()
+	}
+}
+
 // extractJWT из cookie или заголовка Authorization.
 func extractJWT(r *http.Request) string {
 	if c, err := r.Cookie(AuthCookieName); err == nil && c.Value != "" {
