@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"net/url"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -11,13 +12,49 @@ import (
 )
 
 const (
-	// AuthCookieName имя cookie с JWT (сессия).
+	// AuthCookieName имя cookie с JWT
 	AuthCookieName = "auth_token"
 	ctxUserID      = "auth_user_id"
 	ctxIsModerator = "auth_is_moderator"
 )
 
 func bearerPrefix() string { return "Bearer " }
+
+// CORSMiddleware — для фронта (Vite), GitHub Pages и Tauri WebView.
+// Нельзя одновременно ставить Origin * и Allow-Credentials: true (браузер это отклонит);
+// при переданном Origin отражаем его и включаем credentials.
+//
+// WebKit/WebView в Tauri иногда не шлёт Origin на cross-origin fetch, но шлёт Referer —
+// тогда восстанавливаем допустимый Allow-Origin из Referer (dev: Vite на 127.0.0.1:3000).
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		origin := c.Request.Header.Get("Origin")
+		if origin != "" {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		} else if ref := c.Request.Header.Get("Referer"); ref != "" {
+			if u, err := url.Parse(ref); err == nil && u.Scheme != "" && u.Host != "" {
+				c.Writer.Header().Set("Access-Control-Allow-Origin", u.Scheme+"://"+u.Host)
+				c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+			}
+		} else {
+			c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		}
+		c.Writer.Header().Set("Vary", "Origin")
+		c.Writer.Header().Set(
+			"Access-Control-Allow-Headers",
+			"Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, Accept, Origin, Cache-Control, X-Requested-With",
+		)
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, PATCH")
+		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length, Authorization")
+
+		if c.Request.Method == http.MethodOptions {
+			c.AbortWithStatus(http.StatusNoContent)
+			return
+		}
+		c.Next()
+	}
+}
 
 // extractJWT из cookie или заголовка Authorization.
 func extractJWT(r *http.Request) string {
