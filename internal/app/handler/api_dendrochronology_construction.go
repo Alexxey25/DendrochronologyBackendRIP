@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"metoda/internal/app/repository"
@@ -113,7 +114,7 @@ func (h *Handler) APIDeleteFromCart(ctx *gin.Context) {
 
 // APIUpdateCartItem Обновить параметры строки в заявке
 // @Summary Изменить строку заявки
-// @Description Образцы, даты резки и коррекции для пары конструкция–заявка.
+// @Description Образцы, даты резки и коррекции для пары конструкция–заявка
 // @Tags dendrochronologies
 // @Accept json
 // @Produce json
@@ -163,9 +164,15 @@ func (h *Handler) APIUpdateCartItem(ctx *gin.Context) {
 		return
 	}
 
+	life := strings.TrimSpace(item.UseLifeOverride)
+	if life == "" {
+		life = item.Construction.UseLife
+	}
+
 	ctx.JSON(http.StatusOK, serializer.DendroConstructionUpdateJSON{
 		SamplesCount:   item.SamplesCount,
 		CuttingDate:    item.CuttingDate,
 		DateCorrection: item.DateCorrection,
+		UseLife:        life,
 	})
 }

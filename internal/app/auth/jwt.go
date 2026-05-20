@@ -17,7 +17,7 @@ const (
 func JWTSecret() []byte {
 	s := os.Getenv("JWT_KEY")
 	if s == "" {
-		return []byte("default-dev-only-unsafe")
+		return []byte("default-string-unsafe")
 	}
 	return []byte(s)
 }

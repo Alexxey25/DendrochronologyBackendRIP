@@ -3,6 +3,7 @@ package repository
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/sirupsen/logrus"
@@ -69,10 +70,14 @@ func (r *Repository) GetDendrochronologyWithConstructions(dendrochronologyID uin
 	}
 	var views []DendrochronologyConstructionView
 	for _, item := range items {
+		life := strings.TrimSpace(item.UseLifeOverride)
+		if life == "" {
+			life = item.Construction.UseLife
+		}
 		views = append(views, DendrochronologyConstructionView{
 			ID:                item.ID,
 			ConstructionTitle: item.Construction.ConstructionTitle,
-			UseLife:           item.Construction.UseLife,
+			UseLife:           life,
 			ImageURL:          item.Construction.ImageURL,
 			SamplesCount:      item.SamplesCount,
 			CuttingDate:       item.CuttingDate,
@@ -251,11 +256,15 @@ func (r *Repository) GetDendrochronologyConstructionsAPI(id uint) ([]serializer.
 	}
 	views := make([]serializer.DendroConstructionViewJSON, 0, len(items))
 	for _, item := range items {
+		life := strings.TrimSpace(item.UseLifeOverride)
+		if life == "" {
+			life = item.Construction.UseLife
+		}
 		views = append(views, serializer.DendroConstructionViewJSON{
 			ID:                item.ID,
 			ConstructionID:    item.ConstructionID,
 			ConstructionTitle: item.Construction.ConstructionTitle,
-			UseLife:           item.Construction.UseLife,
+			UseLife:           life,
 			ImageURL:          item.Construction.ImageURL,
 			SamplesCount:      item.SamplesCount,
 			CuttingDate:       item.CuttingDate,
@@ -491,12 +500,14 @@ func (r *Repository) UpdateConstructionInCartAPI(constructionID, dendrochronolog
 	}
 	updates["cutting_date"] = j.CuttingDate
 	updates["date_correction"] = j.DateCorrection
+	updates["use_life_override"] = j.UseLife
 
 	if err := r.db.Model(&item).Updates(updates).Error; err != nil {
 		return ds.DendrochronologyConstruction{}, err
 	}
 
-	// Re-fetch
-	r.db.Where("construction_id = ? AND dendrochronology_id = ?", constructionID, dendrochronologyID).First(&item)
+	if err := r.db.Preload("Construction").First(&item, item.ID).Error; err != nil {
+		return ds.DendrochronologyConstruction{}, err
+	}
 	return item, nil
 }

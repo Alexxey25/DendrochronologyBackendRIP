@@ -9,6 +9,7 @@ import (
 	"github.com/redis/go-redis/v9"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+	"metoda/internal/app/ds"
 )
 
 var (
@@ -29,6 +30,15 @@ func New(dsn string) (*Repository, error) {
 	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		return nil, err
+	}
+
+	if err := db.AutoMigrate(
+		&ds.Users{},
+		&ds.Construction{},
+		&ds.Dendrochronology{},
+		&ds.DendrochronologyConstruction{},
+	); err != nil {
+		return nil, fmt.Errorf("db automigrate: %w", err)
 	}
 
 	mc, err := minioClient.InitMinio()

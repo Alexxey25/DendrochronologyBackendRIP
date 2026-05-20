@@ -6,7 +6,8 @@ import (
 	"metoda/internal/app/repository"
 )
 
-const minioBaseURL = "http://localhost:9090/constructions"
+// URL превью файлов; порт должен совпадать с MINIO_PORT (.env) и docker-compose (nginx).
+const minioBaseURL = "http://192.168.194.69:9090/constructions"
 
 type Handler struct {
 	Repository *repository.Repository
@@ -29,7 +30,6 @@ func (h *Handler) RegisterHandler(router *gin.Engine) {
 	router.POST("/add-to-dendrochronology", h.AddToDendrochronology)
 	router.POST("/delete-dendrochronology", h.DeleteDendrochronology)
 
-	// --- REST API: лаб. 4 — сессия (JWT в cookie / Authorization), Redis blacklist, права модератора ---
 	api := router.Group("/api")
 
 	// Без авторизации: чтение каталога + регистрация и вход
