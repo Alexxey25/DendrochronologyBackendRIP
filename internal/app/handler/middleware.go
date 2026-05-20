@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"net/http"
-	"os"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -19,61 +18,21 @@ const (
 
 func bearerPrefix() string { return "Bearer " }
 
-func corsAllowedOriginsFromEnv() []string {
-	raw := strings.TrimSpace(os.Getenv("CORS_ALLOWED_ORIGINS"))
-	if raw == "" {
-		return nil
-	}
-	parts := strings.Split(raw, ",")
-	out := make([]string, 0, len(parts))
-	for _, p := range parts {
-		p = strings.TrimSpace(p)
-		if p != "" {
-			out = append(out, p)
-		}
-	}
-	return out
-}
-
-func isAllowedCORSOrigin(origin string, extra []string) bool {
+func isAllowedCORSOrigin(origin string) bool {
 	if origin == "" {
 		return true
 	}
-	static := []string{
-		"http://localhost:3000",
-		"http://127.0.0.1:3000",
-		"https://localhost:3000",
-		"https://127.0.0.1:3000",
-		"http://localhost:4173",
-		"http://127.0.0.1:4173",
-		"http://192.168.1.35:3000",
-		"http://192.168.1.35:4173",
-		"https://192.168.194.69:3000",
-		"https://192.168.194.69:4173",
-		"http://192.168.194.69:8080",
-		"http://192.168.194.69:9090",
-		"tauri://localhost",
-		"http://tauri.localhost",
-		"https://tauri.localhost",
+	// Tauri и Vite dev — только http (https для демо не нужен)
+	if strings.HasPrefix(origin, "http://") {
+		return true
 	}
-	for _, o := range static {
-		if origin == o {
-			return true
-		}
-	}
-	for _, o := range extra {
-		if origin == o {
-			return true
-		}
-	}
-	if strings.HasPrefix(origin, "https://") && strings.HasSuffix(origin, ".github.io") {
+	if origin == "tauri://localhost" {
 		return true
 	}
 	return false
 }
 
 func CORSMiddleware() gin.HandlerFunc {
-	extra := corsAllowedOriginsFromEnv()
 	return func(c *gin.Context) {
 		origin := c.Request.Header.Get("Origin")
 
@@ -82,7 +41,7 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Expose-Headers", "Content-Length, Authorization")
 		c.Writer.Header().Set("Vary", "Origin")
 
-		if origin != "" && isAllowedCORSOrigin(origin, extra) {
+		if origin != "" && isAllowedCORSOrigin(origin) {
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 			c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		}
